@@ -5,7 +5,6 @@
  */
 package trabalhocg;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import javax.swing.JFrame;
@@ -140,9 +139,8 @@ public class TrabalhoCG {
         face1.edges.get(15).v1 = face1.edges.get(14).v2;
         face1.edges.get(15).v2 = face1.edges.get(0).v1;
         
-        System.out.println(face0.edges.get(0).v1.x);
         face1.add(150);
-        System.out.println(face0.edges.get(0).v1.x);
+
         LinkedList<Face> faces = new LinkedList();
         
         faces.add(face0);
