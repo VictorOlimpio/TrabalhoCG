@@ -1,12 +1,40 @@
 # -*- coding: utf-8 -*-
 from solid import *
-import numpy as num
+from graphics import *
+import numpy
 import time
 
-def clear(win):
+def clear_window(win):
     for item in win.items[:]:
         item.undraw()
     win.update()
+
+def mouse_click(window, points, vertices):
+    click = window.getMouse().clone()
+    result = Rectangle(Point(-1,-1),Point(0,0))
+    for i in range(len(points)):
+        if((click.getX() >= points[i][0].x) and (points[i][1].x >= click.getX()) and
+           (click.getY() >= points[i][0].y) and (points[i][1].y >= click.getY())):
+            pontoAtual = Point(vertices[i][0], vertices[i][1])
+            point = Circle(pontoAtual, 6)
+            point.setOutline("black")
+
+            point.setFill("red")
+            point.draw(window)
+            update(60)
+            time.sleep(0.1)
+            point.undraw()
+
+            update(60)
+            point.setFill("yellow")
+            point.draw(window)
+            update(60)
+
+            return point
+
+    result.draw(window)
+    return result
+
 
 def main():
     w, h = 1300, 700
@@ -71,42 +99,110 @@ def main():
               [15, 31, 16, 0],
               [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]]
 
-    solid = Solid()
-    solid.add_vertices(num.array(solid_vertices))
-    solid.add_edges(star)
 
-    solid.scale(1, 1, 6)
-    solid.translation(650, 120, 0)
-
-    solid.rot_x(0.7)
-    #solid.rot_y(0.4)
-    #solid.rot_z(0.5)
-
-    #solid.isometric_projection(0.5, 0.5)
-
-    #solid.oblique(0.5, 13 * 5)
-
-    #solid.perspective(100 + 10 * 13)
-
-    solid.paint_points(window)
-    solid.draw(window, 0.05)
-    solid.paint(faces, window)
-    update(60)
 
     active = True
     while active:
-        anwser = input("Digite um numero de 0 a 31 para destacar um vértice, ou digite S/N para sair: ")
-        if anwser != "s" or "n":
-            point = anwser
-        elif anwser == "s":
+        solid = Solid()
+        solid.add_vertices(numpy.array(solid_vertices))
+        solid.add_edges(star)
+
+        solid.scale(1, 1, 6)
+        solid.translation(650, 120, 0)
+
+        message = "Bem Vindo, selecione uma das opções no console do terminal"
+        subtitle_message = ""
+
+        title = Text(Point(683, 10), message)
+        sub_title = Text(Point(683, 30), subtitle_message)
+
+        title.setFace("arial")
+        title.setStyle("bold")
+
+        sub_title.setFace("arial")
+        sub_title.setStyle("bold")
+
+        title.draw(window)
+        solid.print_vertices()
+
+        anwser = input("Escolha uma das opções abaixo, ou digite N para sair:\n"
+                       "1- Para uma rotação no eixo x:\n"
+                       "2- Para uma rotação no eixo y:\n"
+                       "3- Para uma rotação no eixo z:\n"
+                       "4- Para uma projeção isométrica:\n"
+                       "5- Para uma projeção obliqua:\n"
+                       "6- Para uma projeção em perspectiva usando um ponto de fuga:\n")
+        if anwser == "n":
             active = False
 
-        pt = Circle(Point(solid.vertices[point][0], solid.vertices[point][1]), 4)
-        pt.setFill("red")
-        pt.draw(window)
-        update(60)
-        time.sleep(0.2)
-        pt.undraw()
+        if anwser == 1:
+            clear_window(window)
+            subtitle_message = "Rotação no eixo X"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+            angle = input("Insira o valor de um angulo")
+            solid.rot_x(angle)
+        if anwser == 2:
+            clear_window(window)
+            subtitle_message = "Rotação no eixo Y"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+            angle = input("Insira o valor de um angulo")
+            solid.rot_y(angle)
+        if anwser == 3:
+            clear_window(window)
+            subtitle_message = "Rotação no eixo Z"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+            angle = input("Insira o valor de um angulo")
+            solid.rot_z(angle)
+        if anwser == 4:
+            clear_window(window)
+            subtitle_message = "Projeção Isométrica com angulo em x 35.26 e em y 45"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+            solid.isometric_projection(35.26, 45)
+        if anwser == 5:
+            clear_window(window)
+            subtitle_message = "Projeção Obliqua Cabinet"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+            solid.oblique(0.5, 13 * 5)
+        if anwser == 6:
+            clear_window(window)
+            subtitle_message = "Projeção em Perspectiva com 1 ponto de fuga"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+            solid.perspective(100 + 10 * 13)
+
+        title = Text(Point(683, 10), message)
+        title.draw(window)
+
+
+
+
+        points = solid.paint_points(window)
+
+        solid.draw(window, 0.05)
+        solid.paint(faces, window)
+        title.undraw()
+        sub_title.undraw()
+
+        stil = True
+        while(stil):
+            subtitle_message = "Clique em um dos quadrados na esquerda da tela para destacar \n " \
+                      "o respectivo ponto no sólido, ou clique em qualquer lugar da tela para prosseguir."
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+            update(60)
+            result = mouse_click(window, points, solid.vertices)
+            if (result.getP1().x == -1):
+                sub_title.undraw()
+                stil = False
+            time.sleep(0.2)
+            result.undraw()
+
+            sub_title.undraw()
         update(60)
 
     window.getMouse()
