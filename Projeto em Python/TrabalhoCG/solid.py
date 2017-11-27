@@ -1,5 +1,6 @@
 import numpy
 import math
+import colorsys
 from numpy.distutils.system_info import numarray_info
 
 from graphics import *
@@ -7,7 +8,7 @@ from graphics import *
 class Solid:
 
     def __init__(self):
-        self.p = [765, 301, -1000]
+        self.p = [1000, 700, -10]
         self.rgb_scale = 255
         self.cmyk_scale = 100
         self.vertices = numpy.zeros((0, 4))
@@ -254,7 +255,7 @@ class Solid:
         return numpy.arccos(numpy.clip(numpy.dot(v1_u, v2_u), -1.0, 1.0))
 
     def vector_light(self, normal):
-        return numpy.subtract(self.p, normal)
+        return numpy.subtract(normal, self.p)
 
     def lights(self):
         lights = []
@@ -311,30 +312,16 @@ class Solid:
         result.append(b)
         return result
 
-    def rgb_to_hsv(self, r, g, b):
-
-        mx = max(r, g, b)
-        mn = min(r, g, b)
-
-        delta = mx - mn
-        if mx == mn:
-            h = 0
-        elif mx == r:
-            h = (60 * (abs(g - b) / delta) + 360)
-        elif mx == g:
-            h = (60 * (abs(b - r) / delta) + 120)
-        elif mx == b:
-            h = (60 * (abs(r - g) / delta) + 240)
-        if mx == 0:
-            s = 0
-        else:
-            s = delta / mx
-        v = mx
+    def hsv(self, angle, coef, cos):
+        h = angle
+        s = 1
+        v = coef * 255 * cos
 
         result = []
         result.append(h)
         result.append(s)
         result.append(v)
+        #print result
         return result
 
     def hsv_to_rgb(self, h, s, v):
@@ -364,17 +351,18 @@ class Solid:
             r, g, b = t, p, v
         elif hi == 5:
             r, g, b = v, p, q
-        r, g, b = int(r * 255), int(g * 255), int(b * 255)
 
         result = []
         result.append(r)
         result.append(g)
         result.append(b)
+        print result
         return result
 
-    def paint(self, faces, window, colors, type):
+
+    def paint(self, faces, window, type):
         #colors = ["skyblue", "violet", "green", "purple", "pink", "blue", "brown", "indigo", "grey", "orange"]
-        coef = 0.7
+        coef = 0.8
         j = 0
         l = 0
         visibles = self.visibles()
@@ -389,43 +377,53 @@ class Solid:
                     points.append(point)
 
                 f = Polygon(points)
-                v1 = numpy.array(normals[l])
-                v2 = numpy.array(lights[l])
+                v1 = numpy.array(lights[l])
+                v2 = numpy.array(normals[l])
 
                 cos = self.angle(v1, v2)
 
                 if type == 1:
-                    r = abs(coef * colors[0] * cos)
-                    g = abs(coef * colors[1] * cos)
-                    b = abs(coef * colors[2] * cos)
+                    hsv = self.hsv(0, coef, cos)
+                    converted = self.hsv_to_rgb(hsv[0], hsv[1], hsv[2])
+                    r = converted[0]
+                    g = converted[1]
+                    b = converted[2]
 
                 if type == 2:
-
-                    converted = self.rgb_to_cmyk(colors[0], colors[1], colors[2])
-
-                    r = abs(coef * converted[0] * cos)
-                    g = abs(coef * converted[1] * cos)
-                    b = abs(coef * converted[2] * cos)
-                    k = abs(coef * converted[3] * cos)
-
-                    converted = self.cmyk_to_rgb(r, g, b, k)
-
+                    hsv = self.hsv(60, coef, cos)
+                    converted = self.hsv_to_rgb(hsv[0], hsv[1], hsv[2])
                     r = converted[0]
                     g = converted[1]
                     b = converted[2]
 
                 if type == 3:
-                    converted = self.rgb_to_hsv(colors[0], colors[1], colors[2])
-
-                    r = abs(coef * converted[0] * cos)
-                    g = abs(coef * converted[1] * cos)
-                    b = abs(coef * converted[2] * cos)
-
-                    converted = self.hsv_to_rgb(r, g, b)
-
+                    hsv = self.hsv(120, coef, cos)
+                    converted = self.hsv_to_rgb(hsv[0], hsv[1], hsv[2])
                     r = converted[0]
                     g = converted[1]
                     b = converted[2]
+
+                if type == 4:
+                    hsv = self.hsv(180, coef, cos)
+                    converted = self.hsv_to_rgb(hsv[0], hsv[1], hsv[2])
+                    r = converted[0]
+                    g = converted[1]
+                    b = converted[2]
+
+                if type == 5:
+                    hsv = self.hsv(240, coef, cos)
+                    converted = self.hsv_to_rgb(hsv[0], hsv[1], hsv[2])
+                    r = converted[0]
+                    g = converted[1]
+                    b = converted[2]
+
+                if type == 6:
+                    hsv = self.hsv(300, coef, cos)
+                    converted = self.hsv_to_rgb(hsv[0], hsv[1], hsv[2])
+                    r = converted[0]
+                    g = converted[1]
+                    b = converted[2]
+
 
                 f.setFill(color_rgb(r, g, b))
                 f.setOutline(color_rgb(r, g, b))

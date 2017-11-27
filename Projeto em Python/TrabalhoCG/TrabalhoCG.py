@@ -102,6 +102,7 @@ def main():
              [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]]
 
     active = True
+    type = 0
     while active:
         colors = [50, 100, 20]
 
@@ -112,140 +113,150 @@ def main():
         solid.scale(1, 1, 6)
         solid.translation(650, 120, 0)
 
-        message = "Bem Vindo, selecione uma das opções no console do terminal"
-        subtitle_message = ""
+        # message = "Bem Vindo, selecione uma das opções no console do terminal"
+        # subtitle_message = ""
+        #
+        # title = Text(Point(683, 10), message)
+        # sub_title = Text(Point(683, 30), subtitle_message)
+        #
+        # title.setFace("arial")
+        # title.setStyle("bold")
+        #
+        # sub_title.setFace("arial")
+        # sub_title.setStyle("bold")
 
-        title = Text(Point(683, 10), message)
-        sub_title = Text(Point(683, 30), subtitle_message)
+        # title.draw(window)
+        # solid.print_vertices()
 
-        title.setFace("arial")
-        title.setStyle("bold")
+        # anwser = input("Escolha uma das opções abaixo, ou digite N para sair:\n"
+        #                "1- Para uma rotação no eixo x:\n"
+        #                "2- Para uma rotação no eixo y:\n"
+        #                "3- Para uma rotação no eixo z:\n"
+        #                "4- Para uma projeção isométrica:\n"
+        #                "5- Para uma projeção obliqua:\n"
+        #                "6- Para uma projeção em perspectiva usando um ponto de fuga:\n")
+        # if anwser == "n":
+        #     active = False
+        #
+        # if anwser == 1:
+        #     clear_window(window)
+        #     subtitle_message = "Rotação no eixo X"
+        #     sub_title = Text(Point(683, 30), subtitle_message)
+        #     sub_title.draw(window)
+        #     angle = input("Insira o valor de um angulo")
+        #     solid.rot_x(angle)
+        #
+        # if anwser == 2:
+        #     clear_window(window)
+        #     subtitle_message = "Rotação no eixo Y"
+        #     sub_title = Text(Point(683, 30), subtitle_message)
+        #     sub_title.draw(window)
+        #     angle = input("Insira o valor de um angulo")
+        #     solid.rot_y(angle)
+        #
+        # if anwser == 3:
+        #     clear_window(window)
+        #     subtitle_message = "Rotação no eixo Z"
+        #     sub_title = Text(Point(683, 30), subtitle_message)
+        #     sub_title.draw(window)
+        #     angle = input("Insira o valor de um angulo")
+        #     solid.rot_z(angle)
+        #
+        # if anwser == 4:
+        #     clear_window(window)
+        #     subtitle_message = "Projeção Isométrica com angulo em x 35.26 e em y 45"
+        #     sub_title = Text(Point(683, 30), subtitle_message)
+        #     sub_title.draw(window)
+        #     solid.isometric_projection(35.26, 45)
+        #
+        #     option = input("Escolha uma das opções abaixo, ou digite N para sair:\n"
+        #                    "1- Para exibir em RGB:\n"
+        #                    "2- Para exibir em CMY:\n"
+        #                    "3- Para exibir em HSV:\n")
+        #
+        #     if option == 1:
+        #         solid.paint(faces, window, colors, 1)
+        #     if option == 2:
+        #         solid.paint(faces, window, colors, 2)
+        #     if option == 3:
+        #         solid.paint(faces, window, colors, 3)
+        # if anwser == 5:
+        #     clear_window(window)
+        #     subtitle_message = "Projeção Obliqua Cabinet"
+        #     sub_title = Text(Point(683, 30), subtitle_message)
+        #     sub_title.draw(window)
+        #     solid.oblique(0.5, 13 * 5)
+        #
+        #     option = input("Escolha uma das opções abaixo, ou digite N para sair:\n"
+        #                    "1- Para exibir em RGB:\n"
+        #                    "2- Para exibir em CMY:\n"
+        #                    "3- Para exibir em HSV:\n")
+        #     if option == 1:
+        #         solid.paint(faces, window, colors, 1)
+        #     if option == 2:
+        #         solid.paint(faces, window, colors, 2)
+        #     if option == 3:
+        #         solid.paint(faces, window, colors, 3)
+        #
+        # if anwser == 6:
+        #     clear_window(window)
+        #     subtitle_message = "Projeção em Perspectiva com 1 ponto de fuga"
+        #     sub_title = Text(Point(683, 30), subtitle_message)
+        #     sub_title.draw(window)
+        #     solid.perspective(100 + 10 * 13)
+        #
+        #     option = input("Escolha uma das opções abaixo, ou digite N para sair:\n"
+        #                    "1- Para exibir em RGB:\n"
+        #                    "2- Para exibir em CMY:\n"
+        #                    "3- Para exibir em HSV:\n")
+        #     if option == 1:
+        #         solid.paint(faces, window, colors, 1)
+        #     if option == 2:
+        #         solid.paint(faces, window, colors, 2)
+        #     if option == 3:
+        #         solid.paint(faces, window, colors, 3)
+        solid.isometric_projection(35.26, 45)
+        type += 1
 
-        sub_title.setFace("arial")
-        sub_title.setStyle("bold")
+        if type > 6:
+            type = 1
 
-        title.draw(window)
-        solid.print_vertices()
+        solid.paint(faces, window, type)
+        time.sleep(1)
+        update(60)
+        clear_window(window)
 
-        anwser = input("Escolha uma das opções abaixo, ou digite N para sair:\n"
-                       "1- Para uma rotação no eixo x:\n"
-                       "2- Para uma rotação no eixo y:\n"
-                       "3- Para uma rotação no eixo z:\n"
-                       "4- Para uma projeção isométrica:\n"
-                       "5- Para uma projeção obliqua:\n"
-                       "6- Para uma projeção em perspectiva usando um ponto de fuga:\n")
-        if anwser == "n":
-            active = False
+        # title = Text(Point(683, 10), message)
+        # title.draw(window)
 
-        if anwser == 1:
-            clear_window(window)
-            subtitle_message = "Rotação no eixo X"
-            sub_title = Text(Point(683, 30), subtitle_message)
-            sub_title.draw(window)
-            angle = input("Insira o valor de um angulo")
-            solid.rot_x(angle)
-
-        if anwser == 2:
-            clear_window(window)
-            subtitle_message = "Rotação no eixo Y"
-            sub_title = Text(Point(683, 30), subtitle_message)
-            sub_title.draw(window)
-            angle = input("Insira o valor de um angulo")
-            solid.rot_y(angle)
-
-        if anwser == 3:
-            clear_window(window)
-            subtitle_message = "Rotação no eixo Z"
-            sub_title = Text(Point(683, 30), subtitle_message)
-            sub_title.draw(window)
-            angle = input("Insira o valor de um angulo")
-            solid.rot_z(angle)
-
-        if anwser == 4:
-            clear_window(window)
-            subtitle_message = "Projeção Isométrica com angulo em x 35.26 e em y 45"
-            sub_title = Text(Point(683, 30), subtitle_message)
-            sub_title.draw(window)
-            solid.isometric_projection(35.26, 45)
-
-            option = input("Escolha uma das opções abaixo, ou digite N para sair:\n"
-                           "1- Para exibir em RGB:\n"
-                           "2- Para exibir em CMY:\n"
-                           "3- Para exibir em HSV:\n")
-
-            if option == 1:
-                solid.paint(faces, window, colors, 1)
-            if option == 2:
-                solid.paint(faces, window, colors, 2)
-            if option == 3:
-                solid.paint(faces, window, colors, 3)
-        if anwser == 5:
-            clear_window(window)
-            subtitle_message = "Projeção Obliqua Cabinet"
-            sub_title = Text(Point(683, 30), subtitle_message)
-            sub_title.draw(window)
-            solid.oblique(0.5, 13 * 5)
-
-            option = input("Escolha uma das opções abaixo, ou digite N para sair:\n"
-                           "1- Para exibir em RGB:\n"
-                           "2- Para exibir em CMY:\n"
-                           "3- Para exibir em HSV:\n")
-            if option == 1:
-                solid.paint(faces, window, colors, 1)
-            if option == 2:
-                solid.paint(faces, window, colors, 2)
-            if option == 3:
-                solid.paint(faces, window, colors, 3)
-
-        if anwser == 6:
-            clear_window(window)
-            subtitle_message = "Projeção em Perspectiva com 1 ponto de fuga"
-            sub_title = Text(Point(683, 30), subtitle_message)
-            sub_title.draw(window)
-            solid.perspective(100 + 10 * 13)
-
-            option = input("Escolha uma das opções abaixo, ou digite N para sair:\n"
-                           "1- Para exibir em RGB:\n"
-                           "2- Para exibir em CMY:\n"
-                           "3- Para exibir em HSV:\n")
-            if option == 1:
-                solid.paint(faces, window, colors, 1)
-            if option == 2:
-                solid.paint(faces, window, colors, 2)
-            if option == 3:
-                solid.paint(faces, window, colors, 3)
-
-        title = Text(Point(683, 10), message)
-        title.draw(window)
-
-        points = solid.paint_points(window)
+        # points = solid.paint_points(window)
 
         #solid.draw(window, 0.05)
 
 
 
-        title.undraw()
-        sub_title.undraw()
+        # title.undraw()
+        # sub_title.undraw()
 
-        stil = True
-        while (stil):
-            subtitle_message = "Clique em um dos quadrados na esquerda da tela para destacar \n " \
-                               "o respectivo ponto no sólido, ou clique em qualquer lugar da tela para prosseguir."
-            sub_title = Text(Point(683, 30), subtitle_message)
-            sub_title.draw(window)
-            update(60)
-            result = mouse_click(window, points, solid.vertices)
-            if (result.getP1().x == -1):
-                sub_title.undraw()
-                stil = False
-            time.sleep(0.2)
-            result.undraw()
+        # stil = True
+        # while (stil):
+        #     subtitle_message = "Clique em um dos quadrados na esquerda da tela para destacar \n " \
+        #                        "o respectivo ponto no sólido, ou clique em qualquer lugar da tela para prosseguir."
+        #     sub_title = Text(Point(683, 30), subtitle_message)
+        #     sub_title.draw(window)
+        #     update(60)
+        #     result = mouse_click(window, points, solid.vertices)
+        #     if (result.getP1().x == -1):
+        #         sub_title.undraw()
+        #         stil = False
+        #     time.sleep(0.2)
+        #     result.undraw()
+        #
+        #     sub_title.undraw()
+        # update(60)
 
-            sub_title.undraw()
-        update(60)
-
-    window.getMouse()
-    window.close()
+    # window.getMouse()
+    # window.close()
 
 
 main()
