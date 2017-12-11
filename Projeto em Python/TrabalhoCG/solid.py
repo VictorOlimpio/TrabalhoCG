@@ -8,7 +8,7 @@ from graphics import *
 class Solid:
 
     def __init__(self):
-        self.p = [1000, 700, -10]
+        self.p = [1000, 1000, -1000]
         self.rgb_scale = 255
         self.cmyk_scale = 100
         self.vertices = numpy.zeros((0, 4))
@@ -237,7 +237,7 @@ class Solid:
         visibles.append(self.back_face_culling(normals[15], self.vertices[14]))
         visibles.append(self.back_face_culling(normals[16], self.vertices[15]))
         visibles.append(self.back_face_culling(normals[17], self.vertices[18]))
-
+        # print visibles
         return visibles
 
 
@@ -264,54 +264,6 @@ class Solid:
         return lights
 
 
-    def rgb_to_cmyk(self, r, g, b):
-        result = []
-        if (r == 0) and (g == 0) and (b == 0):
-            # black
-            c = 0
-            m = 0
-            y = 0
-            k = self.cmyk_scale
-            result.append(c)
-            result.append(m)
-            result.append(y)
-            result.append(k)
-            return result
-
-        c = 1 - r / float(self.rgb_scale)
-        m = 1 - g / float(self.rgb_scale)
-        y = 1 - b / float(self.rgb_scale)
-
-        min_cmy = min(c, m, y)
-        c = abs((c - min_cmy))
-        m = abs((m - min_cmy))
-        y = abs((y - min_cmy))
-        k = min_cmy
-
-        c = c * self.cmyk_scale
-        m = m * self.cmyk_scale
-        y = y * self.cmyk_scale
-        k = k * self.cmyk_scale
-
-        result.append(c)
-        result.append(m)
-        result.append(y)
-        result.append(k)
-
-        return result
-
-    def cmyk_to_rgb(self, c, m, y, k):
-        result = []
-
-        r = abs(self.rgb_scale * (1.0 - c / float(self.cmyk_scale)) * (1.0 - k / float(self.cmyk_scale)))
-        g = abs(self.rgb_scale * (1.0 - m / float(self.cmyk_scale)) * (1.0 - k / float(self.cmyk_scale)))
-        b = abs(self.rgb_scale * (1.0 - y / float(self.cmyk_scale)) * (1.0 - k / float(self.cmyk_scale)))
-
-        result.append(r)
-        result.append(g)
-        result.append(b)
-        return result
-
     def hsv(self, angle, coef, cos):
         h = angle
         s = 1
@@ -321,7 +273,7 @@ class Solid:
         result.append(h)
         result.append(s)
         result.append(v)
-        #print result
+        # print result
         return result
 
     def hsv_to_rgb(self, h, s, v):
@@ -353,12 +305,101 @@ class Solid:
             r, g, b = v, p, q
 
         result = []
+        if r > 255:
+            r = 255
+        if g > 255:
+            g = 255
+        if b > 255:
+            b = 255
         result.append(r)
         result.append(g)
         result.append(b)
-        print result
+        # print result
         return result
 
+
+    # Trabalho 4
+    def normalize(self, v):
+        mag = math.sqrt(sum(n * n for n in v))
+        v = tuple(n / mag for n in v)
+        return v
+
+    def quaternios_multi(self, q1, q2):
+        w1 = q1[0]
+        x1 = q1[1]
+        y1 = q1[2]
+        z1 = q1[3]
+
+        w2 = q2[0]
+        x2 = q2[1]
+        y2 = q2[2]
+        z2 = q2[3]
+        w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2
+        x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2
+        y = w1 * y2 + y1 * w2 + z1 * x2 - x1 * z2
+        z = w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2
+        return w, x, y, z
+
+    def conjugate(self, q):
+        w = q[0]
+        x = q[1]
+        y = q[2]
+        z = q[3]
+        return (w, -x, -y, -z)
+
+    def qv_multiplicate(self, q1, v1):
+        q2 = []
+        q2.append(0)
+        q2.append(v1[0])
+        q2.append(v1[1])
+        q2.append(q2[2])
+        return self.quaternios_multi(self.quaternios_multi(q1, q2), self.conjugate(q1))[1:]
+
+    def axisangle_to_q(self, n, angle):
+        n = self.normalize(n)
+        x = n[0]
+        y = n[1]
+        z = n[2]
+        angle /= 2
+        w = numpy.cos(angle)
+        x *= numpy.sin(angle)
+        y *= numpy.sin(angle)
+        z *= numpy.sin(angle)
+        return w, x, y, z
+
+    def quaternions_rotation(self, n):
+        q = self.axisangle_to_q(n, (numpy.pi / 3) / 2)
+        print len(q)
+
+        for i in range(len(self.vertices)):
+            v = self.qv_multiplicate(q, self.vertices[i])
+            self.vertices[i][0] = v[0]
+            self.vertices[i][1] = v[1]
+            self.vertices[i][2] = v[2]
+
+    def listaDePontosConvexHull(self):
+        t = 0
+        n = 16
+
+        matrizResp = []
+        while (t != 1):
+            matrizParcial = [0, 0, 0]
+            for i in range(n):
+                polBern = (math.factorial(n) / (math.factorial(i) * math.factorial(n - i))) * ((1 - t) ** (n - i)) * (
+                t ** i)
+                matrizParcial = ([matrizParcial[0] + polBern * self.vertices[i][0], matrizParcial[1] + polBern * self.vertices[i][1],
+                                  matrizParcial[2] + polBern * self.vertices[i][2]])
+            matrizResp.append([matrizParcial[0], matrizParcial[1], matrizParcial[2], 1])
+            t = t + 0.125
+
+        for i in range(len(matrizResp)):
+            matrizResp.append([matrizResp[i][0], matrizResp[i][1], 10, 1])
+
+        print(">>>>>> MAtriz resp \n")
+        print(str(matrizResp))
+
+        # return matrizResp
+        self.vertices = matrizResp
 
     def paint(self, faces, window, type):
         #colors = ["skyblue", "violet", "green", "purple", "pink", "blue", "brown", "indigo", "grey", "orange"]
@@ -428,7 +469,7 @@ class Solid:
                 f.setFill(color_rgb(r, g, b))
                 f.setOutline(color_rgb(r, g, b))
                 f.draw(window)
-                time.sleep(0.2)
+                # time.sleep(0.2)
 
                 update(60)
 

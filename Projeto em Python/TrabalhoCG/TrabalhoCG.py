@@ -103,6 +103,7 @@ def main():
 
     active = True
     type = 0
+    a = -1
     while active:
         colors = [50, 100, 20]
 
@@ -114,16 +115,16 @@ def main():
         solid.translation(650, 120, 0)
 
         # message = "Bem Vindo, selecione uma das opções no console do terminal"
-        # subtitle_message = ""
+        subtitle_message = ""
         #
         # title = Text(Point(683, 10), message)
-        # sub_title = Text(Point(683, 30), subtitle_message)
+        sub_title = Text(Point(683, 30), subtitle_message)
         #
         # title.setFace("arial")
         # title.setStyle("bold")
         #
-        # sub_title.setFace("arial")
-        # sub_title.setStyle("bold")
+        sub_title.setFace("arial")
+        sub_title.setStyle("bold")
 
         # title.draw(window)
         # solid.print_vertices()
@@ -215,16 +216,77 @@ def main():
         #         solid.paint(faces, window, colors, 2)
         #     if option == 3:
         #         solid.paint(faces, window, colors, 3)
-        solid.isometric_projection(35.26, 45)
+        # solid.isometric_projection(35.26, 45)
+        solid.perspective(100 + 10 * 13)
+        # solid.oblique(0.5, 13 * 5)
         type += 1
+        a += 1
+
+        # axis = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [1, 0, 1],[0, 1, 1], [1, 1, 1], [-1, 0, 0],
+        #         [0, -1, 0], [0, 0, -1], [-1, -1, -0], [-1, -0, -1], [0, -1, -1], [-1, -1, -1]]
+
+        # axis = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0], [1, 0, 1], [0, 1, 1], [1, 1, 1], [-1, 0, 0],
+        #         [0, -1, 0], [0, 0, -1], [-1, -1, -0], [-1, -0, -1], [0, -1, -1], [-1, -1, -1], [-1, 0, 1], [1, -1, -1],
+        #         [0, 1, -1]]
+
+        axis = [[-1, 0, 1], [0, 1, 0], [1, -1, -1], [0, 1, -1], [-1, 0, 0], [1, -1, 0], [0, 0, -1]]
+        # print len(axis)
+        print a
+        if a > len(axis):
+            a = 0
 
         if type > 6:
             type = 1
 
-        solid.paint(faces, window, type)
+
+
+        if type == 1:
+            subtitle_message = "Red"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+
+        if type == 2:
+            subtitle_message = "Yellow"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+
+        if type == 3:
+            subtitle_message = "Green"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+
+        if type == 4:
+            subtitle_message = "Cyan"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+
+        if type == 5:
+            subtitle_message = "Blue"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+
+        if type == 6:
+            subtitle_message = "Magenta"
+            sub_title = Text(Point(683, 30), subtitle_message)
+            sub_title.draw(window)
+
+
+
+        #solid.paint(faces, window, type)
+        # time.sleep(1)
+        # update(60)
+
+        center = solid.get_center()
+        solid.translation(-center[0], -center[1], -center[2])
+
+        solid.quaternions_rotation(axis[a])
+        solid.translation(center[0], center[1], center[2])
+
         time.sleep(1)
-        update(60)
         clear_window(window)
+
+        solid.paint(faces, window, type)
+
 
         # title = Text(Point(683, 10), message)
         # title.draw(window)
@@ -236,7 +298,7 @@ def main():
 
 
         # title.undraw()
-        # sub_title.undraw()
+        sub_title.undraw()
 
         # stil = True
         # while (stil):
