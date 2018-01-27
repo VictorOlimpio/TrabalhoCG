@@ -1,14 +1,12 @@
 import numpy
 import math
-import colorsys
-from numpy.distutils.system_info import numarray_info
 
 from graphics import *
 
 class Solid:
 
     def __init__(self):
-        self.p = [1000, 1000, -1000]
+        self.p = [1000, 1000, -50]
         self.rgb_scale = 255
         self.cmyk_scale = 100
         self.vertices = numpy.zeros((0, 4))
@@ -113,7 +111,7 @@ class Solid:
             vertex[2] = abs(vertex[2] / vertex[3])
             vertex[3] = abs(vertex[3] / vertex[3])
 
-        self.scale(70, 70, 70)
+        self.scale(30, 30, 30)
         self.translation(750, 250, 0)
 
     def oblique(self, l, angle):
@@ -193,51 +191,27 @@ class Solid:
         normal = numpy.cross(v1[:3], v2[:3])
         return normal
 
-    def normals(self):
+    def normals(self, faces):
         normals = []
-        normals.append(self.normal(self.vertices[0], self.vertices[1], self.vertices[2]))
-        normals.append(self.normal(self.vertices[0], self.vertices[16], self.vertices[17]))
-        normals.append(self.normal(self.vertices[1], self.vertices[17], self.vertices[18]))
-        normals.append(self.normal(self.vertices[2], self.vertices[18], self.vertices[19]))
-        normals.append(self.normal(self.vertices[3], self.vertices[19], self.vertices[20]))
-        normals.append(self.normal(self.vertices[4], self.vertices[20], self.vertices[21]))
-        normals.append(self.normal(self.vertices[5], self.vertices[21], self.vertices[22]))
-        normals.append(self.normal(self.vertices[6], self.vertices[22], self.vertices[23]))
-        normals.append(self.normal(self.vertices[7], self.vertices[23], self.vertices[24]))
-        normals.append(self.normal(self.vertices[8], self.vertices[24], self.vertices[25]))
-        normals.append(self.normal(self.vertices[9], self.vertices[25], self.vertices[26]))
-        normals.append(self.normal(self.vertices[10], self.vertices[26], self.vertices[27]))
-        normals.append(self.normal(self.vertices[11], self.vertices[27], self.vertices[28]))
-        normals.append(self.normal(self.vertices[12], self.vertices[28], self.vertices[29]))
-        normals.append(self.normal(self.vertices[13], self.vertices[29], self.vertices[30]))
-        normals.append(self.normal(self.vertices[14], self.vertices[30], self.vertices[31]))
-        normals.append(self.normal(self.vertices[15], self.vertices[31], self.vertices[16]))
-        normals.append(self.normal(self.vertices[22], self.vertices[21], self.vertices[20]))
+        for i in range(len(faces)):
+            v1 = self.vertices[faces[i][0]]
+            v2 = self.vertices[faces[i][1]]
+            v3 = self.vertices[faces[i][2]]
+            if i == len(faces) - 1:
+                v1 = self.vertices[faces[i][2]]
+                v2 = self.vertices[faces[i][1]]
+                v3 = self.vertices[faces[i][0]]
+            normals.append(self.normal(v1, v2, v3))
 
         return normals
 
-    def visibles(self):
+    def visibles(self, faces):
         visibles = []
-        normals = self.normals()
-        visibles.append(self.back_face_culling(normals[0], self.vertices[0]))
-        visibles.append(self.back_face_culling(normals[1], self.vertices[0]))
-        visibles.append(self.back_face_culling(normals[2], self.vertices[1]))
-        visibles.append(self.back_face_culling(normals[3], self.vertices[2]))
-        visibles.append(self.back_face_culling(normals[4], self.vertices[3]))
-        visibles.append(self.back_face_culling(normals[5], self.vertices[4]))
-        visibles.append(self.back_face_culling(normals[6], self.vertices[5]))
-        visibles.append(self.back_face_culling(normals[7], self.vertices[6]))
-        visibles.append(self.back_face_culling(normals[8], self.vertices[7]))
-        visibles.append(self.back_face_culling(normals[9], self.vertices[8]))
-        visibles.append(self.back_face_culling(normals[10], self.vertices[9]))
-        visibles.append(self.back_face_culling(normals[11], self.vertices[10]))
-        visibles.append(self.back_face_culling(normals[12], self.vertices[11]))
-        visibles.append(self.back_face_culling(normals[13], self.vertices[12]))
-        visibles.append(self.back_face_culling(normals[14], self.vertices[13]))
-        visibles.append(self.back_face_culling(normals[15], self.vertices[14]))
-        visibles.append(self.back_face_culling(normals[16], self.vertices[15]))
-        visibles.append(self.back_face_culling(normals[17], self.vertices[18]))
-        # print visibles
+        normals = self.normals(faces)
+
+        for i in range(len(faces)):
+            visibles.append(self.back_face_culling(normals[i], self.vertices[faces[i][0]]))
+
         return visibles
 
 
@@ -257,9 +231,9 @@ class Solid:
     def vector_light(self, normal):
         return numpy.subtract(normal, self.p)
 
-    def lights(self):
+    def lights(self, faces):
         lights = []
-        for normal in self.normals():
+        for normal in self.normals(faces):
             lights.append(self.vector_light(normal))
         return lights
 
@@ -273,7 +247,6 @@ class Solid:
         result.append(h)
         result.append(s)
         result.append(v)
-        # print result
         return result
 
     def hsv_to_rgb(self, h, s, v):
@@ -314,101 +287,78 @@ class Solid:
         result.append(r)
         result.append(g)
         result.append(b)
-        # print result
         return result
 
 
-    # Trabalho 4
-    def normalize(self, v):
-        mag = math.sqrt(sum(n * n for n in v))
-        v = tuple(n / mag for n in v)
-        return v
-
-    def quaternios_multi(self, q1, q2):
-        w1 = q1[0]
-        x1 = q1[1]
-        y1 = q1[2]
-        z1 = q1[3]
-
-        w2 = q2[0]
-        x2 = q2[1]
-        y2 = q2[2]
-        z2 = q2[3]
-        w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2
-        x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2
-        y = w1 * y2 + y1 * w2 + z1 * x2 - x1 * z2
-        z = w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2
-        return w, x, y, z
-
-    def conjugate(self, q):
-        w = q[0]
-        x = q[1]
-        y = q[2]
-        z = q[3]
-        return (w, -x, -y, -z)
-
-    def qv_multiplicate(self, q1, v1):
-        q2 = []
-        q2.append(0)
-        q2.append(v1[0])
-        q2.append(v1[1])
-        q2.append(q2[2])
-        return self.quaternios_multi(self.quaternios_multi(q1, q2), self.conjugate(q1))[1:]
-
-    def axisangle_to_q(self, n, angle):
-        n = self.normalize(n)
-        x = n[0]
-        y = n[1]
-        z = n[2]
-        angle /= 2
-        w = numpy.cos(angle)
-        x *= numpy.sin(angle)
-        y *= numpy.sin(angle)
-        z *= numpy.sin(angle)
-        return w, x, y, z
-
-    def quaternions_rotation(self, n):
-        q = self.axisangle_to_q(n, (numpy.pi / 3) / 2)
-        print len(q)
+    def quaternios_rotation(self, n):
+        angle = numpy.pi/3
+        s = numpy.cos(angle/2)
+        v = numpy.dot(numpy.sin(angle/2), n)
+        resp = []
+        for i in range(len(self.vertices)):
+            r = self.vertices[i][:3]
+            vv = numpy.dot(v, v)
+            vr = numpy.dot(v, r)
+            result = numpy.dot(s**2, r) - numpy.dot(vv, r) + numpy.dot(2*(vr), v) + numpy.dot(2*s, numpy.cross(v, r))
+            resp.append(result)
 
         for i in range(len(self.vertices)):
-            v = self.qv_multiplicate(q, self.vertices[i])
-            self.vertices[i][0] = v[0]
-            self.vertices[i][1] = v[1]
-            self.vertices[i][2] = v[2]
+            self.vertices[i][:3] = resp[i]
 
-    def listaDePontosConvexHull(self):
+
+    def convex_hull(self, vertices):
         t = 0
         n = 16
+        answer = []
+        while (t < 1):
 
-        matrizResp = []
-        while (t != 1):
-            matrizParcial = [0, 0, 0]
-            for i in range(n):
-                polBern = (math.factorial(n) / (math.factorial(i) * math.factorial(n - i))) * ((1 - t) ** (n - i)) * (
-                t ** i)
-                matrizParcial = ([matrizParcial[0] + polBern * self.vertices[i][0], matrizParcial[1] + polBern * self.vertices[i][1],
-                                  matrizParcial[2] + polBern * self.vertices[i][2]])
-            matrizResp.append([matrizParcial[0], matrizParcial[1], matrizParcial[2], 1])
-            t = t + 0.125
+            parcial = [0, 0, 0]
 
-        for i in range(len(matrizResp)):
-            matrizResp.append([matrizResp[i][0], matrizResp[i][1], 10, 1])
+            for i in range(n+1):
+                binomial = math.factorial(n) / (float(math.factorial(i) * math.factorial(n - i)))
+                print n-i
+                pol_bern = binomial * ((1 - t) ** (n - i)) * (t ** i)
+                parcial = [parcial[0] + (pol_bern * vertices[i][0]), parcial[1] + (pol_bern * vertices[i][1]), 10]
 
-        print(">>>>>> MAtriz resp \n")
-        print(str(matrizResp))
 
-        # return matrizResp
-        self.vertices = matrizResp
+            answer.append(parcial)
+            # t += 0.0625
+            t += 0.001
+        for i in range(len(answer)):
+            answer.append([answer[i][0], answer[i][1], 50])
+        print len(answer)
+        return answer
+
+    def create_faces(self):
+        faces = []
+        front = []
+        back = []
+        side = []
+        j = len(self.vertices) / 2
+        for i in range(len(self.vertices[0:j])):
+            front.append(i)
+
+        faces.append(front)
+
+        for i in range(len(self.vertices[j:])):
+            back.append(i + j)
+
+        for i in range(len(front) - 1):
+            faces.append([front[i], back[i], back[i + 1], front[i + 1]])
+
+        faces.append([front[len(front)-1], back[len(back)-1], back[0], front[0]])
+
+        faces.append(back)
+        print faces
+
+        return faces
 
     def paint(self, faces, window, type):
-        #colors = ["skyblue", "violet", "green", "purple", "pink", "blue", "brown", "indigo", "grey", "orange"]
-        coef = 0.8
-        j = 0
+        coef = 0.5
         l = 0
-        visibles = self.visibles()
-        normals = self.normals()
-        lights = self.lights()
+        visibles = self.visibles(faces)
+        normals = self.normals(faces)
+        lights = self.lights(faces)
         for face in faces:
             points = []
 
@@ -420,7 +370,6 @@ class Solid:
                 f = Polygon(points)
                 v1 = numpy.array(lights[l])
                 v2 = numpy.array(normals[l])
-
                 cos = self.angle(v1, v2)
 
                 if type == 1:
@@ -469,13 +418,9 @@ class Solid:
                 f.setFill(color_rgb(r, g, b))
                 f.setOutline(color_rgb(r, g, b))
                 f.draw(window)
-                # time.sleep(0.2)
+               # time.sleep(0.2)
 
                 update(60)
-
-                if (j > 8):
-                    j = 0
-                j += 1
 
             l += 1
 

@@ -75,6 +75,19 @@ def main():
                       [205, 355, 50],
                       [150, 320, 50],
                       [110, 265, 50]]
+    front = []
+    for i in range(len(solid_vertices)/2):
+        front.append(solid_vertices[i])
+
+    front.append(solid_vertices[0])
+
+    solid = Solid()
+    front = solid.convex_hull(front)
+
+    solid_vertices = []
+
+    for f in front:
+        solid_vertices.append(f)
 
     star = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11],
             [11, 12], [12, 13], [13, 14], [14, 15], [15, 0], [0, 16], [1, 17], [2, 18], [3, 19],
@@ -82,28 +95,28 @@ def main():
             [14, 30], [15, 31], [16, 17], [17, 18], [18, 19], [19, 20], [20, 21], [21, 22],
             [22, 23], [23, 24], [24, 25], [25, 26], [26, 27], [27, 28], [28, 29], [29, 30], [30, 31], [31, 16]]
 
-
     active = True
     type = 0
     a = -1
 
-    solid = Solid()
+
     solid.add_vertices(numpy.array(solid_vertices))
     solid.add_edges(star)
+
+    solid.print_vertices()
 
     faces = solid.create_faces()
 
     subtitle_message = ""
     sub_title = Text(Point(683, 30), subtitle_message)
-    solid.print_vertices()
     sub_title.setFace("arial")
     sub_title.setStyle("bold")
 
-    solid.scale(0.5, 0.5, 4)
+    solid.scale(1, 1, 6)
     solid.translation(450, 120, 0)
-
     solid.oblique(0.5, 13 * 5)
     solid.scale(1, 1, 6)
+
     while active:
 
         type += 1
@@ -115,20 +128,10 @@ def main():
         if type > 6:
             type = 1
 
-        center = solid.get_center()
-        aux_vet = solid.vertices.copy()
-
-        solid.translation(-center[0], -center[1], -center[2])
-
-        solid.quaternios_rotation(axis[a])
-
-        solid.translation(center[0], center[1], center[2])
-
         time.sleep(.8)
         clear_window(window)
         update(60)
 
         solid.paint(faces, window, type)
-        solid.vertices = aux_vet
 
 main()
